@@ -1,3 +1,4 @@
+
 import styles from './TaskCard.module.css';
 
 const PRIORITY_CONFIG = {
@@ -15,13 +16,25 @@ function formatDate(dateStr) {
   return { formatted, isOverdue };
 }
 
-export default function TaskCard({ task, onEdit, onDelete, onToggle }) {
+export default function TaskCard({ task, onEdit, onDelete, onToggle, dragHandleProps }) {
   const priority = PRIORITY_CONFIG[task.priority] || PRIORITY_CONFIG.medium;
   const due = formatDate(task.dueDate);
 
   return (
     <div className={`${styles.card} ${task.completed ? styles.completed : ''}`}>
       <div className={styles.top}>
+        {/* Drag Handle */}
+        <div className={styles.dragHandle} {...dragHandleProps} title="Drag to reorder">
+          <svg width="12" height="16" viewBox="0 0 12 16" fill="none">
+            <circle cx="4" cy="3" r="1.5" fill="currentColor"/>
+            <circle cx="8" cy="3" r="1.5" fill="currentColor"/>
+            <circle cx="4" cy="8" r="1.5" fill="currentColor"/>
+            <circle cx="8" cy="8" r="1.5" fill="currentColor"/>
+            <circle cx="4" cy="13" r="1.5" fill="currentColor"/>
+            <circle cx="8" cy="13" r="1.5" fill="currentColor"/>
+          </svg>
+        </div>
+
         <button
           className={`${styles.checkbox} ${task.completed ? styles.checked : ''}`}
           onClick={() => onToggle(task._id, task.completed)}
@@ -79,3 +92,5 @@ export default function TaskCard({ task, onEdit, onDelete, onToggle }) {
     </div>
   );
 }
+
+
