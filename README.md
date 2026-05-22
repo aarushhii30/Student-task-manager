@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # TaskFlow — Student Task Manager
 
 A full-stack task management web app built with React (Vite) + Node.js/Express + MongoDB.
