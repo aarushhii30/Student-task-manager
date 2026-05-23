@@ -49,6 +49,16 @@ export const useTasks = (filters = {}) => {
     return updateTask(id, { completed: !completed });
   };
 
+  // Client-side reorder (no backend call needed)
+  const reorderTasks = (sourceIndex, destIndex) => {
+    setTasks((prev) => {
+      const updated = Array.from(prev);
+      const [removed] = updated.splice(sourceIndex, 1);
+      updated.splice(destIndex, 0, removed);
+      return updated;
+    });
+  };
+
   return {
     tasks,
     loading,
@@ -57,6 +67,7 @@ export const useTasks = (filters = {}) => {
     updateTask,
     deleteTask,
     toggleComplete,
+    reorderTasks,
     refetch: fetchTasks,
   };
 };

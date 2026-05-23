@@ -1,7 +1,8 @@
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import TaskCard from './TaskCard';
 import styles from './TaskList.module.css';
 
-export default function TaskList({ tasks, loading, error, onEdit, onDelete, onToggle }) {
+export default function TaskList({ tasks, loading, error, onEdit, onDelete, onToggle, onReorder }) {
   if (loading) {
     return (
       <div className={styles.stateContainer}>
@@ -30,17 +31,44 @@ export default function TaskList({ tasks, loading, error, onEdit, onDelete, onTo
     );
   }
 
+  const handleDragEnd = (result) => {
+    if (!result.destination) return;
+    if (result.destination.index === result.source.index) return;
+    onReorder(result.source.index, result.destination.index);
+  };
+
   return (
-    <div className={styles.list}>
-      {tasks.map((task) => (
-        <TaskCard
-          key={task._id}
-          task={task}
-          onEdit={onEdit}
-          onDelete={onDelete}
-          onToggle={onToggle}
-        />
-      ))}
-    </div>
+    <DragDropContext onDragEnd={handleDragEnd}>
+      <Droppable droppableId="tasks">
+        {(provided, snapshot) => (
+          <div
+            className={`${styles.list} ${snapshot.isDraggingOver ? styles.draggingOver : ''}`}
+            {...provided.droppableProps}
+            ref={provided.innerRef}
+          >
+            {tasks.map((task, index) => (
+              <Draggable key={task._id} draggableId={task._id} index={index}>
+                {(provided, snapshot) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    className={snapshot.isDragging ? styles.dragging : ''}
+                  >
+                    <TaskCard
+                      task={task}
+                      onEdit={onEdit}
+                      onDelete={onDelete}
+                      onToggle={onToggle}
+                      dragHandleProps={provided.dragHandleProps}
+                    />
+                  </div>
+                )}
+              </Draggable>
+            ))}
+            {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
+    </DragDropContext>
   );
 }

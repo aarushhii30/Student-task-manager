@@ -1,4 +1,3 @@
-
 import styles from './TaskCard.module.css';
 
 const PRIORITY_CONFIG = {
@@ -76,7 +75,6 @@ export default function TaskCard({ task, onEdit, onDelete, onToggle, dragHandleP
         <span className={`${styles.priority} ${styles[priority.color]}`}>
           {priority.label}
         </span>
-
         {due && (
           <span className={`${styles.due} ${due.isOverdue && !task.completed ? styles.overdue : ''}`}>
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -92,5 +90,3 @@ export default function TaskCard({ task, onEdit, onDelete, onToggle, dragHandleP
     </div>
   );
 }
-
-

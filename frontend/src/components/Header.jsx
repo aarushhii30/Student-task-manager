@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import styles from './Header.module.css';
 
 export default function Header({ onAddTask }) {
   const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <header className={styles.header}>
@@ -26,6 +28,7 @@ export default function Header({ onAddTask }) {
           </button>
 
           {user ? (
+            /* Logged in — show avatar + dropdown */
             <div className={styles.userMenu}>
               <button
                 className={styles.avatar}
@@ -48,7 +51,15 @@ export default function Header({ onAddTask }) {
                 </div>
               )}
             </div>
-          ) : null}
+          ) : (
+            /* Not logged in — show Sign In button */
+            <button
+              className={styles.signInBtn}
+              onClick={() => navigate('/auth')}
+            >
+              Sign In
+            </button>
+          )}
         </div>
       </div>
     </header>

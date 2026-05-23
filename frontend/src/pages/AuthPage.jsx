@@ -4,12 +4,18 @@ import { useAuth } from '../hooks/useAuth';
 import styles from './AuthPage.module.css';
 
 export default function AuthPage() {
-  const [mode, setMode] = useState('login'); // 'login' | 'signup'
+  const [mode, setMode] = useState('login');
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login, signup } = useAuth();
+  const { login, signup, user } = useAuth();
   const navigate = useNavigate();
+
+  // Already logged in → go home
+  if (user) {
+    navigate('/');
+    return null;
+  }
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -24,11 +30,16 @@ export default function AuthPage() {
       if (mode === 'login') {
         await login(form.email, form.password);
       } else {
+        if (!form.name.trim()) {
+          setError('Name is required');
+          setLoading(false);
+          return;
+        }
         await signup(form.name, form.email, form.password);
       }
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || 'Something went wrong');
+      setError(err.response?.data?.message || 'Something went wrong. Check your internet connection.');
     } finally {
       setLoading(false);
     }
@@ -99,7 +110,11 @@ export default function AuthPage() {
           </div>
 
           <button className={styles.submitBtn} type="submit" disabled={loading}>
-            {loading ? 'Please wait...' : mode === 'login' ? 'Sign In' : 'Create Account'}
+            {loading
+              ? 'Please wait...'
+              : mode === 'login'
+              ? 'Sign In'
+              : 'Create Account'}
           </button>
         </form>
 
@@ -107,15 +122,15 @@ export default function AuthPage() {
           {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
           <button
             className={styles.toggleBtn}
-            onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(''); }}
+            onClick={() => {
+              setMode(mode === 'login' ? 'signup' : 'login');
+              setError('');
+              setForm({ name: '', email: '', password: '' });
+            }}
           >
             {mode === 'login' ? 'Sign up' : 'Sign in'}
           </button>
         </p>
-
-        <div className={styles.guestNote}>
-          <p>Or <a href="/" className={styles.guestLink}>continue without account</a></p>
-        </div>
       </div>
     </div>
   );

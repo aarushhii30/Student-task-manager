@@ -161,3 +161,22 @@
 .due.overdue {
   color: var(--danger);
 }
+.dragHandle {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  cursor: grab;
+  padding: 4px 6px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.card:hover .dragHandle {
+  opacity: 1;
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+}
