@@ -17,6 +17,7 @@
 <p>
   <img src="https://img.shields.io/badge/MongoDB-Atlas-47A248?style=for-the-badge&logo=mongodb&logoColor=white" />
   <img src="https://img.shields.io/badge/JWT-Auth-FB015B?style=for-the-badge&logo=jsonwebtokens&logoColor=white" />
+  <img src="https://img.shields.io/badge/Drag%20%26%20Drop-DnD-6C63FF?style=for-the-badge" />
   <img src="https://img.shields.io/badge/Deployed-Vercel%20%2B%20Render-000000?style=for-the-badge&logo=vercel&logoColor=white" />
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" />
 </p>
@@ -62,34 +63,36 @@
 </td>
 <td width="50%">
 
-### 🔍 Filter & Sort
+### 🔍 Filter, Search & Sort
+- ✅ **Search** tasks by title or description (client-side, instant)
 - ✅ Filter by **status** — All / Pending / Completed
 - ✅ Filter by **priority** — High / Medium / Low
 - ✅ Sort by **newest**, **due date**, or **priority**
 - ✅ Live **stats dashboard** (total, pending, done, urgent)
-- ✅ Responsive on **mobile & desktop**
 
 </td>
 </tr>
 <tr>
 <td width="50%">
 
-### 🔐 Authentication (Bonus)
-- ✅ **JWT** signup & login
-- ✅ Per-user **task isolation**
-- ✅ **Guest mode** — use without account
+### 🔐 Authentication
+- ✅ **JWT** signup & login — fully protected routes
+- ✅ Per-user **task isolation** — your tasks, only yours
+- ✅ **Auto redirect** to login if not authenticated
 - ✅ Bcrypt **password hashing**
 - ✅ Token persisted in localStorage
+- ✅ Avatar + dropdown menu with sign out
 
 </td>
 <td width="50%">
 
 ### 🎨 UI / UX
 - ✅ **Dark mode** design system with CSS variables
+- ✅ **Drag & drop** task reordering
+- ✅ **🔔 Overdue notifications** banner with bell animation
 - ✅ **Smooth animations** — cards, modals, states
 - ✅ **Custom fonts** — Syne + DM Sans
-- ✅ Empty, loading & error **states handled**
-- ✅ **Sticky header** with blur backdrop
+- ✅ Responsive on **mobile & desktop**
 
 </td>
 </tr>
@@ -105,8 +108,9 @@
 |:------|:-----------|:--------|
 | ⚛️ **Frontend** | React 18 + Vite | UI framework & build tool |
 | 🎨 **Styling** | CSS Modules | Scoped, maintainable styles |
-| 🔀 **Routing** | React Router v6 | Client-side navigation |
-| 📡 **HTTP** | Axios | API calls with interceptors |
+| 🔀 **Routing** | React Router v6 | Client-side navigation + protected routes |
+| 📡 **HTTP** | Axios | API calls with auth interceptors |
+| 🖱️ **Drag & Drop** | @hello-pangea/dnd | Smooth task reordering |
 | 🟢 **Backend** | Node.js + Express | REST API server |
 | 🍃 **Database** | MongoDB + Mongoose | Data persistence & schemas |
 | 🔑 **Auth** | JWT + bcryptjs | Secure authentication |
@@ -139,22 +143,24 @@ student-task-manager/
 └── 📂 frontend/
     ├── 📂 src/
     │   ├── 📂 components/
-    │   │   ├── Header.jsx         # Sticky nav + user menu
-    │   │   ├── FilterBar.jsx      # Status tabs + dropdowns
-    │   │   ├── TaskCard.jsx       # Individual task row
-    │   │   ├── TaskList.jsx       # List + loading/empty states
-    │   │   └── TaskModal.jsx      # Create / edit form modal
+    │   │   ├── Header.jsx              # Sticky nav + user avatar + sign in/out
+    │   │   ├── FilterBar.jsx           # Status tabs + dropdowns
+    │   │   ├── SearchBar.jsx           # 🔍 Instant client-side search
+    │   │   ├── TaskCard.jsx            # Task row with drag handle
+    │   │   ├── TaskList.jsx            # Drag & drop list wrapper
+    │   │   ├── TaskModal.jsx           # Create / edit form modal
+    │   │   └── OverdueNotification.jsx # 🔔 Overdue tasks banner
     │   ├── 📂 hooks/
     │   │   ├── useAuth.jsx        # Auth context (login/signup/logout)
-    │   │   └── useTasks.js        # Data fetching & mutations
+    │   │   └── useTasks.js        # Data fetching, mutations & reorder
     │   ├── 📂 pages/
-    │   │   ├── HomePage.jsx       # Dashboard page
+    │   │   ├── HomePage.jsx       # Dashboard page (protected)
     │   │   └── AuthPage.jsx       # Login / signup page
     │   ├── 📂 utils/
     │   │   └── api.js             # Axios instance with auth interceptor
     │   ├── 📂 styles/
     │   │   └── global.css         # Design tokens + reset
-    │   ├── App.jsx                # Router + AuthProvider
+    │   ├── App.jsx                # Router + AuthProvider + ProtectedRoute
     │   └── main.jsx               # React entry point
     ├── index.html
     ├── vite.config.js
@@ -171,7 +177,7 @@ student-task-manager/
 ```
 ✔ Node.js ≥ 18
 ✔ npm or yarn
-✔ MongoDB Atlas account (free tier) — or skip for no-persist mode
+✔ MongoDB Atlas account (free tier)
 ✔ Git
 ```
 
@@ -203,7 +209,7 @@ JWT_SECRET=your_super_secret_key_here
 NODE_ENV=development
 ```
 
-> 💡 **No MongoDB?** Leave `MONGO_URI` empty — the app still runs, tasks just won't persist between restarts.
+> ⚠️ If your MongoDB password has special characters like `@`, encode them — e.g. `@` becomes `%40`
 
 ```bash
 npm run dev       # 🔥 development with auto-reload
@@ -235,6 +241,26 @@ npm run build     # 📦 production build
 ```
 
 Frontend lives at → `http://localhost:5173`
+
+---
+
+## 🔐 Auth Flow
+
+```
+Open App
+   ↓
+Not logged in? → Redirected to /auth (Login page)
+   ↓
+Sign up / Login → JWT token saved in localStorage
+   ↓
+Redirected to / (Home page)
+   ↓
+All tasks scoped to your account
+   ↓
+Sign out → Back to /auth
+```
+
+> Tasks created while logged in are **linked to your account** — other users cannot see them.
 
 ---
 
@@ -287,7 +313,7 @@ Authorization: Bearer <your_jwt_token>
 ```js
 {
   _id:         ObjectId,
-  userId:      ObjectId,      // optional — links to user if logged in
+  userId:      ObjectId,      // links to user if logged in
   title:       String,        // required, max 100 chars
   description: String,        // optional, max 500 chars
   priority:    'low' | 'medium' | 'high',
@@ -308,7 +334,7 @@ Authorization: Bearer <your_jwt_token>
   _id:          ObjectId,
   name:         String,       // required
   email:        String,       // unique, lowercase
-  passwordHash: String,       // bcrypt hashed
+  passwordHash: String,       // bcrypt hashed (never stored plain)
   createdAt:    Date
 }
 ```
@@ -322,13 +348,14 @@ Authorization: Bearer <your_jwt_token>
 ### Frontend → Vercel
 
 ```bash
-# 1. Push frontend/ to GitHub
+# 1. Push to GitHub
 # 2. Import repo at vercel.com
-# 3. Set environment variable:
+# 3. Settings:
+#    Root Directory  → frontend
+#    Build Command   → npm run build
+#    Output Dir      → dist
+# 4. Environment Variables:
 VITE_API_URL=https://your-backend.onrender.com/api
-
-# Build command:  npm run build
-# Output dir:     dist
 ```
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
@@ -338,16 +365,21 @@ VITE_API_URL=https://your-backend.onrender.com/api
 ### Backend → Render
 
 ```bash
-# 1. Push backend/ to GitHub
-# 2. Create new Web Service on render.com
-# 3. Set environment variables:
+# 1. Push to GitHub
+# 2. New Web Service on render.com
+# 3. Settings:
+#    Root Directory  → backend
+#    Build Command   → npm install
+#    Start Command   → npm start
+# 4. Environment Variables:
 MONGO_URI=your_atlas_connection_string
 JWT_SECRET=your_secret
 PORT=5000
 NODE_ENV=production
-
-# Start command: npm start
+FRONTEND_URL=https://your-project.vercel.app
 ```
+
+> ⚠️ In MongoDB Atlas → Network Access → add `0.0.0.0/0` to allow Render's IPs
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
 
@@ -365,7 +397,7 @@ GET http://localhost:5000/api/health
 POST /api/auth/signup   → { name, email, password }
 POST /api/auth/login    → { email, password } → save token
 
-# 3. Task CRUD
+# 3. Task CRUD (add token in Authorization header)
 POST   /api/tasks        → create
 GET    /api/tasks        → list all
 PUT    /api/tasks/:id    → update
@@ -384,7 +416,7 @@ DELETE /api/tasks/:id    → delete
 | Responsiveness & UX | 20% | ✅ |
 | Code quality & structure | 15% | ✅ |
 | Documentation & deployment | 10% | ✅ |
-| Extras (auth, tests, polish) | 5% | ✅ |
+| Extras (auth, search, drag-drop, notifications) | 5% | ✅ 🚀 |
 
 </div>
 
@@ -392,9 +424,10 @@ DELETE /api/tasks/:id    → delete
 
 ## 🗺️ Roadmap
 
-- [ ] 🔍 Client-side search bar
-- [ ] 🖱️ Drag-and-drop task reordering
-- [ ] 🔔 Notifications for overdue tasks
+- [x] 🔍 Client-side search bar
+- [x] 🖱️ Drag-and-drop task reordering
+- [x] 🔔 Notifications for overdue tasks
+- [x] 🔐 JWT Auth with protected routes
 - [ ] 📊 Analytics / progress charts
 - [ ] 🌙 Light mode toggle
 - [ ] 🧪 Jest unit tests
@@ -415,7 +448,7 @@ MIT License — feel free to use, fork, and modify.
 
 **Built with 💜 for the Enginow Full-Stack Project**
 
-*React • Node.js • MongoDB • Express • JWT*
+*React • Node.js • MongoDB • Express • JWT • Drag & Drop*
 
 <br/>
 
